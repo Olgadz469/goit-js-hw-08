@@ -2,38 +2,43 @@ import throttle from 'lodash.throttle';
 
 const form = document.querySelector(".feedback-form");
 const localStorageKey = "feedback-form-state";
+let formData = {};
 
-const formData = JSON.parse(localStorage.getItem(localStorageKey)) || {};
+
+loadForm()
+
+function loadForm() {
+
+    let formLoad = JSON.parse(localStorage.getItem(localStorageKey));
+    if (!formLoad) {
+      return;
+    }
+    else {
+    formData = formLoad;
+    form.elements.email.value = formData.email || '';
+    form.elements.message.value = formData.message || '';
+    }
+
+}
 
 form.addEventListener("input", throttle(onInput, 500 ));
 form.addEventListener("submit", onSubmit );
 
 
-function onInput (evt) {
+function onInput (event) {
 
-    const formData = {
-     email : form.elements.email.value,
-     message : form.elements.message.value
-    };
-
+  formData[event.target.name] = event.target.value;
   localStorage.setItem(localStorageKey, JSON.stringify(formData));
 
 }
 
 
-function onSubmit (evt) {
+function onSubmit (event) {
 
-  evt.preventDefault();
+  event.preventDefault();
 
-  const email = form.elements.email.value;
-  const message = form.elements.message.value;
-
-  if (email === "" || message === "") {
+  if (!event.target.email.value || !event.target.message.value) {
     return alert("Please fill in all the fields!");
-  }
-  else {
-    formData.email = email;
-    formData.message = message;
   }
 
   console.log(formData);
